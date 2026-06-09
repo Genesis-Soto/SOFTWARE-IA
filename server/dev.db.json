@@ -1,0 +1,31 @@
+{
+  "users": [
+    {
+      "id": "86704481-28b4-4e56-a92a-2a785b5b7093",
+      "email": "analista@example.com",
+      "password_hash": "$2b$12$moFcqUV77ieCCBE6rjUDFOSnWxZ6Ggl5CqrgFuy9CviR2RDoZt6mu",
+      "full_name": "Analista Principal",
+      "role": "ANALYST",
+      "created_at": "2026-06-07T23:02:36.143Z",
+      "updated_at": "2026-06-07T23:02:36.143Z"
+    },
+    {
+      "id": "873bbe68-078a-4559-a762-de75e7d1546a",
+      "email": "deploy@example.com",
+      "password_hash": "$2b$12$rbcprePyIAv1gYOb0I0t3OB2Yn5OqjKYfC13xzEP62yn/iG3.8a1u",
+      "full_name": "Deploy User",
+      "role": "ANALYST",
+      "created_at": "2026-06-07T23:08:46.656Z",
+      "updated_at": "2026-06-07T23:08:46.656Z"
+    },
+    {
+      "id": "035dd18b-dc0c-46fa-b51e-9d218d04b2ea",
+      "email": "genesiselenad@gmail.com",
+      "password_hash": "$2a$12$n/DsGeNnHBaW9L6FA6Nl4erjBGZCyc8Z43jIp.0am8FoRPq8MtNr2",
+      "full_name": "Genesis Elena",
+      "role": "ANALYST",
+      "created_at": "2026-06-08T04:40:38.975Z",
+      "updated_at": "2026-06-08T04:40:38.975Z"
+    }
+  ]
+}
