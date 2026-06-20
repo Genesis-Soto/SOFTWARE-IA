@@ -108,12 +108,12 @@ export default function Login() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="Minimo 6 caracteres"
+                      placeholder="Minimo 8 caracteres"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 h-11 bg-white border-slate-200"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                   </div>
                 </div>

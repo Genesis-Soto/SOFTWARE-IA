@@ -7,13 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Code2, UserPlus, Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function Register() {
@@ -22,7 +15,6 @@ export default function Register() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('ANALYST');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +24,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await register(email, password, fullName, role);
+      await register(email, password, fullName);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -133,28 +125,14 @@ export default function Register() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="Minimo 6 caracteres"
+                      placeholder="Minimo 8 caracteres"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       className="pl-10 h-11 bg-white border-slate-200"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="role" className="text-slate-700">Role</Label>
-                  <Select value={role} onValueChange={setRole}>
-                    <SelectTrigger className="h-11 bg-white border-slate-200">
-                      <SelectValue placeholder="Select your role" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ANALYST">Analyst</SelectItem>
-                      <SelectItem value="ADMIN">Administrator</SelectItem>
-                      <SelectItem value="CLIENT">Client</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <Button
