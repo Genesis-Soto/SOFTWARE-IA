@@ -2,4 +2,7 @@ node_modules
 # Keep environment variables out of version control
 .env
 
+# Runtime database
+dev.db.json
+
 /generated/prisma

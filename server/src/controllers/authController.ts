@@ -5,6 +5,7 @@ import { ENV } from '../config/env';
 import { db } from '../config/database';
 
 const SALT_ROUNDS = 12;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // Generate JWT Token
 const generateToken = (user: any): string => {
@@ -16,14 +17,14 @@ const generateToken = (user: any): string => {
       fullName: user.full_name || user.fullName,
     },
     ENV.JWT_SECRET,
-    { expiresIn: '7d' }
+    { expiresIn: '24h' }
   );
 };
 
 // Register
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password, fullName, role = 'ANALYST' } = req.body;
+    const { email, password, fullName } = req.body;
 
     // Validation
     if (!email || !password || !fullName) {
@@ -31,13 +32,34 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       return;
     }
 
-    if (password.length < 6) {
-      res.status(400).json({ error: 'Password must be at least 6 characters' });
+    const trimmedEmail = String(email).trim().toLowerCase();
+    const trimmedName = String(fullName).trim();
+
+    if (!EMAIL_RE.test(trimmedEmail)) {
+      res.status(400).json({ error: 'Invalid email format' });
       return;
     }
 
+    if (trimmedName.length > 100) {
+      res.status(400).json({ error: 'Full name must be 100 characters or less' });
+      return;
+    }
+
+    if (password.length < 8) {
+      res.status(400).json({ error: 'Password must be at least 8 characters' });
+      return;
+    }
+
+    if (password.length > 72) {
+      res.status(400).json({ error: 'Password must be 72 characters or less' });
+      return;
+    }
+
+    // Role is always ANALYST for self-registration; admins are promoted separately
+    const role = 'ANALYST';
+
     // Check if email exists
-    const existing = db.users.findByEmail(email);
+    const existing = db.users.findByEmail(trimmedEmail);
     if (existing) {
       res.status(409).json({ error: 'Email already registered' });
       return;
@@ -48,10 +70,10 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     // Create user
     const user = db.users.create({
-      email,
+      email: trimmedEmail,
       password_hash: passwordHash,
-      full_name: fullName,
-      role: role.toUpperCase(),
+      full_name: trimmedName,
+      role,
     });
 
     const token = generateToken(user);

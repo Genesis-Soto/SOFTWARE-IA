@@ -62,8 +62,6 @@ export const db = {
       return true;
     },
   },
-  _raw: data,
-  _save: save,
 };
 
 export default db;
