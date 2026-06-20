@@ -31,8 +31,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .then((res) => {
           setUser(res.user);
         })
-        .catch(() => {
-          localStorage.removeItem('token');
+        .catch((error: Error) => {
+          const isAuthError =
+            error.message.includes('401') ||
+            error.message.includes('Invalid token') ||
+            error.message.includes('Access denied');
+
+          if (isAuthError) {
+            localStorage.removeItem('token');
+          } else {
+            console.error('[Auth] Session check failed (non-auth error):', error.message);
+          }
         })
         .finally(() => {
           setIsLoading(false);

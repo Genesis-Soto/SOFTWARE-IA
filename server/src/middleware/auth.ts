@@ -30,7 +30,16 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({ error: 'Invalid token' });
+    if (error instanceof jwt.TokenExpiredError) {
+      console.warn('[Auth] Token expired for request:', req.path);
+      res.status(401).json({ error: 'Token expired. Please log in again.' });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      console.warn('[Auth] Malformed token for request:', req.path, '-', error.message);
+      res.status(401).json({ error: 'Invalid token' });
+    } else {
+      console.error('[Auth] Unexpected token verification error:', error);
+      res.status(500).json({ error: 'Authentication service error' });
+    }
   }
 };
 

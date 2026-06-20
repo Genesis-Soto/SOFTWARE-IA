@@ -27,15 +27,42 @@ class ApiClient {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        ...options,
+        headers,
+      });
+    } catch (networkError) {
+      throw new Error(
+        `Network error while requesting ${endpoint}: ${
+          networkError instanceof Error ? networkError.message : 'Unknown error'
+        }`
+      );
+    }
 
-    const data = await response.json().catch(() => null);
+    let data: Record<string, unknown> | null = null;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      if (!response.ok) {
+        throw new Error(
+          `HTTP ${response.status}: Server returned non-JSON response for ${endpoint}`
+        );
+      }
+      throw new Error(
+        `Failed to parse response from ${endpoint}: ${
+          parseError instanceof Error ? parseError.message : 'Invalid JSON'
+        }`
+      );
+    }
 
     if (!response.ok) {
-      throw new Error(data?.error || `HTTP ${response.status}`);
+      const message =
+        (data && typeof data === 'object' && 'error' in data && typeof data.error === 'string')
+          ? data.error
+          : `HTTP ${response.status}`;
+      throw new Error(message);
     }
 
     return data as T;
