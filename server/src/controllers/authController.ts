@@ -3,10 +3,10 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { ENV } from '../config/env';
 import { db } from '../config/database';
+import { formatUserResponse, formatUserResponseWithDate } from '../utils/formatUserResponse';
 
 const SALT_ROUNDS = 12;
 
-// Generate JWT Token
 const generateToken = (user: any): string => {
   return jwt.sign(
     {
@@ -60,12 +60,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       success: true,
       message: 'User registered successfully',
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        role: user.role,
-      },
+      user: formatUserResponse(user),
     });
   } catch (error) {
     console.error('[Auth] Register error:', error);
@@ -102,12 +97,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     res.json({
       success: true,
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        role: user.role,
-      },
+      user: formatUserResponse(user),
     });
   } catch (error) {
     console.error('[Auth] Login error:', error);
@@ -132,13 +122,7 @@ export const getMe = (req: any, res: Response): void => {
 
     res.json({
       success: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        role: user.role,
-        createdAt: user.created_at,
-      },
+      user: formatUserResponseWithDate(user),
     });
   } catch (error) {
     console.error('[Auth] GetMe error:', error);
