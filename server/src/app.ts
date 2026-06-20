@@ -29,20 +29,41 @@ app.use('/api/auth', authRoutes);
 const distPath = path.join(__dirname, '../../dist');
 app.use(express.static(distPath));
 
+// 404 handler for unknown API routes
+app.use('/api', (_req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
+});
+
 // Handle React routing, return all requests to React app
 app.use((req, res, next) => {
   if (req.path.startsWith('/api')) {
     return next();
   }
-  res.sendFile(path.join(distPath, 'index.html'));
+  res.sendFile(path.join(distPath, 'index.html'), (err) => {
+    if (err) {
+      console.error('[App] Failed to serve index.html:', err.message);
+      if (!res.headersSent) {
+        res.status(500).send('Application failed to load. Please try again later.');
+      }
+    }
+  });
 });
 
 // Global error handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('[Error]', err);
-  res.status(500).json({
-    error: ENV.NODE_ENV === 'production' ? 'Internal server error' : err.message,
-  });
+  const statusCode = err.status || err.statusCode || 500;
+  const message = ENV.NODE_ENV === 'production'
+    ? 'Internal server error'
+    : err.message || 'Unknown error';
+
+  console.error(`[Error] ${statusCode} -`, err.message || err);
+  if (ENV.NODE_ENV !== 'production' && err.stack) {
+    console.error(err.stack);
+  }
+
+  if (!res.headersSent) {
+    res.status(statusCode).json({ error: message });
+  }
 });
 
 export default app;

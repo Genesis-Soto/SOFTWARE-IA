@@ -13,17 +13,31 @@ let data: DBSchema = { users: [] };
 // Load from disk if exists
 if (fs.existsSync(DB_FILE)) {
   try {
-    data = JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    data = JSON.parse(raw);
     console.log('[DB] Loaded database from', DB_FILE, `(${data.users.length} users)`);
   } catch (e) {
-    console.log('[DB] Creating new database');
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    console.error('[DB] Failed to load database file:', errorMessage);
+    console.error('[DB] Starting with empty database. The corrupted file has been preserved as .bak');
+    try {
+      fs.copyFileSync(DB_FILE, `${DB_FILE}.bak`);
+    } catch (backupError) {
+      console.error('[DB] Could not create backup of corrupted file:', backupError instanceof Error ? backupError.message : String(backupError));
+    }
   }
 } else {
   console.log('[DB] New database created at', DB_FILE);
 }
 
-function save() {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+function save(): void {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+  } catch (e) {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    console.error('[DB] Failed to write database file:', errorMessage);
+    throw new Error(`Database write failed: ${errorMessage}`);
+  }
 }
 
 function generateId(): string {
